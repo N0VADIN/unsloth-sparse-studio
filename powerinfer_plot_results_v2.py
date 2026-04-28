@@ -143,7 +143,7 @@ def _series(rows: List[Dict[str, Any]], mode: str, y_key: str):
     return xs, ys
 
 
-def plot_ppl_delta(rows: List[Dict[str, Any]], out_dir: str, fmt_list: List[str], keep_open: bool = False):
+def plot_ppl_delta(rows: List[Dict[str, Any]], out_dir: str, fmt_list: List[str]):
     plt.figure(figsize=(8, 5))
     modes = sorted(set(r["mask_mode"] for r in rows))
     for mode in modes:
@@ -158,11 +158,10 @@ def plot_ppl_delta(rows: List[Dict[str, Any]], out_dir: str, fmt_list: List[str]
     plt.tight_layout()
     for fmt in fmt_list:
         plt.savefig(os.path.join(out_dir, f"ppl_delta.{fmt}"))
-    if not keep_open:
-        plt.close()
+    plt.close()
 
 
-def plot_ppl_masked(rows: List[Dict[str, Any]], out_dir: str, fmt_list: List[str], keep_open: bool = False):
+def plot_ppl_masked(rows: List[Dict[str, Any]], out_dir: str, fmt_list: List[str]):
     plt.figure(figsize=(8, 5))
     modes = sorted(set(r["mask_mode"] for r in rows))
     for mode in modes:
@@ -177,11 +176,10 @@ def plot_ppl_masked(rows: List[Dict[str, Any]], out_dir: str, fmt_list: List[str
     plt.tight_layout()
     for fmt in fmt_list:
         plt.savefig(os.path.join(out_dir, f"ppl_vs_retained_fraction.{fmt}"))
-    if not keep_open:
-        plt.close()
+    plt.close()
 
 
-def plot_kl(rows: List[Dict[str, Any]], out_dir: str, fmt_list: List[str], keep_open: bool = False):
+def plot_kl(rows: List[Dict[str, Any]], out_dir: str, fmt_list: List[str]):
     plt.figure(figsize=(8, 5))
     modes = sorted(set(r["mask_mode"] for r in rows))
     for mode in modes:
@@ -196,11 +194,10 @@ def plot_kl(rows: List[Dict[str, Any]], out_dir: str, fmt_list: List[str], keep_
     plt.tight_layout()
     for fmt in fmt_list:
         plt.savefig(os.path.join(out_dir, f"kl_vs_hot_frac.{fmt}"))
-    if not keep_open:
-        plt.close()
+    plt.close()
 
 
-def plot_logit_mse(rows: List[Dict[str, Any]], out_dir: str, fmt_list: List[str], keep_open: bool = False):
+def plot_logit_mse(rows: List[Dict[str, Any]], out_dir: str, fmt_list: List[str]):
     plt.figure(figsize=(8, 5))
     modes = sorted(set(r["mask_mode"] for r in rows))
     plotted = False
@@ -210,8 +207,7 @@ def plot_logit_mse(rows: List[Dict[str, Any]], out_dir: str, fmt_list: List[str]
             plotted = True
             plt.plot(xs, ys, marker="o", label=mode)
     if not plotted:
-        if not keep_open:
-            plt.close()
+        plt.close()
         return
     plt.xscale("log")
     plt.xlabel("hot_frac")
@@ -221,11 +217,10 @@ def plot_logit_mse(rows: List[Dict[str, Any]], out_dir: str, fmt_list: List[str]
     plt.tight_layout()
     for fmt in fmt_list:
         plt.savefig(os.path.join(out_dir, f"logit_mse_vs_hot_frac.{fmt}"))
-    if not keep_open:
-        plt.close()
+    plt.close()
 
 
-def plot_top1(rows: List[Dict[str, Any]], out_dir: str, fmt_list: List[str], keep_open: bool = False):
+def plot_top1(rows: List[Dict[str, Any]], out_dir: str, fmt_list: List[str]):
     plt.figure(figsize=(8, 5))
     modes = sorted(set(r["mask_mode"] for r in rows))
     for mode in modes:
@@ -240,11 +235,10 @@ def plot_top1(rows: List[Dict[str, Any]], out_dir: str, fmt_list: List[str], kee
     plt.tight_layout()
     for fmt in fmt_list:
         plt.savefig(os.path.join(out_dir, f"top1_vs_hot_frac.{fmt}"))
-    if not keep_open:
-        plt.close()
+    plt.close()
 
 
-def plot_topk_overlap(rows: List[Dict[str, Any]], out_dir: str, fmt_list: List[str], topk_list: List[int], keep_open: bool = False):
+def plot_topk_overlap(rows: List[Dict[str, Any]], out_dir: str, fmt_list: List[str], topk_list: List[int]):
     for k in topk_list:
         plt.figure(figsize=(8, 5))
         modes = sorted(set(r["mask_mode"] for r in rows))
@@ -266,8 +260,7 @@ def plot_topk_overlap(rows: List[Dict[str, Any]], out_dir: str, fmt_list: List[s
                 any_plot = True
                 plt.plot(xs, ys, marker="o", label=mode)
         if not any_plot:
-            if not keep_open:
-                plt.close()
+            plt.close()
             continue
         plt.xscale("log")
         plt.xlabel("hot_frac")
@@ -277,8 +270,7 @@ def plot_topk_overlap(rows: List[Dict[str, Any]], out_dir: str, fmt_list: List[s
         plt.tight_layout()
         for fmt in fmt_list:
             plt.savefig(os.path.join(out_dir, f"top{k}_overlap_vs_hot_frac.{fmt}"))
-        if not keep_open:
-            plt.close()
+        plt.close()
 
 
 def _coverage_xy(cum: np.ndarray):
@@ -288,9 +280,7 @@ def _coverage_xy(cum: np.ndarray):
     return x, y
 
 
-def plot_mass_coverage_from_profile(
-    profile_json: Dict[str, Any], out_dir: str, fmt_list: List[str], keep_open: bool = False
-):
+def plot_mass_coverage_from_profile(profile_json: Dict[str, Any], out_dir: str, fmt_list: List[str]):
     layers: Dict[int, Dict[str, Any]] = {}
     for k, v in profile_json.items():
         if isinstance(k, str) and k.isdigit() and isinstance(v, dict):
@@ -312,6 +302,7 @@ def plot_mass_coverage_from_profile(
         cm_mass = entry.get("cumulative_mass_by_mass")
         cm_freq = entry.get("cumulative_mass_by_freq")
         sum_abs = entry.get("sum_abs")
+        freq = entry.get("freq")
 
         if cm_mass is not None and len(cm_mass) > 0:
             cum = np.array(cm_mass, dtype=float)
@@ -327,7 +318,7 @@ def plot_mass_coverage_from_profile(
             plt.plot(x, y, label=f"layer {layer_idx} (by freq)", linestyle="--")
             plotted = True
 
-        if sum_abs is not None and len(sum_abs) > 0:
+        if sum_abs is not None and freq is not None and len(sum_abs) > 0:
             sum_abs_arr = np.array(sum_abs, dtype=float)
             order_by_mass = np.argsort(-sum_abs_arr)
             sorted_mass = sum_abs_arr[order_by_mass]
@@ -343,8 +334,7 @@ def plot_mass_coverage_from_profile(
         plotted = True
 
     if not plotted:
-        if not keep_open:
-            plt.close()
+        plt.close()
         return
 
     plt.xlabel("Top X% neurons")
@@ -355,8 +345,7 @@ def plot_mass_coverage_from_profile(
     plt.tight_layout()
     for fmt in fmt_list:
         plt.savefig(os.path.join(out_dir, f"activation_mass_coverage.{fmt}"))
-    if not keep_open:
-        plt.close()
+    plt.close()
 
 
 def generate_html_report(image_paths: List[str], output_html: str):
@@ -371,9 +360,7 @@ def generate_html_report(image_paths: List[str], output_html: str):
     for p in image_paths:
         ext = os.path.splitext(p)[1].lstrip(".").lower()
         if ext not in embeddable_exts:
-            report_dir = os.path.dirname(output_html) or "."
-            link_path = os.path.relpath(p, start=report_dir)
-            html_parts.append(f"<p><a href='{link_path}'>{os.path.basename(p)}</a></p>")
+            html_parts.append(f"<p><a href='{os.path.basename(p)}'>{os.path.basename(p)}</a></p>")
             continue
 
         with open(p, "rb") as f:
@@ -467,17 +454,15 @@ def main():
 
     write_summary_csv(rows, args.output_dir)
 
-    keep_figures_open = args.show and not args.html_report
-
-    plot_ppl_delta(rows, args.output_dir, fmt_list, keep_open=keep_figures_open)
-    plot_ppl_masked(rows, args.output_dir, fmt_list, keep_open=keep_figures_open)
-    plot_kl(rows, args.output_dir, fmt_list, keep_open=keep_figures_open)
-    plot_logit_mse(rows, args.output_dir, fmt_list, keep_open=keep_figures_open)
-    plot_top1(rows, args.output_dir, fmt_list, keep_open=keep_figures_open)
+    plot_ppl_delta(rows, args.output_dir, fmt_list)
+    plot_ppl_masked(rows, args.output_dir, fmt_list)
+    plot_kl(rows, args.output_dir, fmt_list)
+    plot_logit_mse(rows, args.output_dir, fmt_list)
+    plot_top1(rows, args.output_dir, fmt_list)
     if topk_list:
-        plot_topk_overlap(rows, args.output_dir, fmt_list, topk_list, keep_open=keep_figures_open)
+        plot_topk_overlap(rows, args.output_dir, fmt_list, topk_list)
     if profile_json:
-        plot_mass_coverage_from_profile(profile_json, args.output_dir, fmt_list, keep_open=keep_figures_open)
+        plot_mass_coverage_from_profile(profile_json, args.output_dir, fmt_list)
 
     produced = sorted(
         [
